@@ -40,9 +40,14 @@ async function ConnectDB() {
 
 
 // home get method
-app.get("/", function (req, res) {
-  res.send("Hello World");
+const contacts = [
+  { id: '1', name: 'John Doe', email: 'john.doe@example.com', phone: '123-456-7890' },
+];
+
+app.get('/contacts', (req, res) => {
+  res.send(contacts);
 });
+
 
 
 
