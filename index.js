@@ -3,56 +3,62 @@ import express from "express";
 import { MongoClient } from "mongodb";
 import "dotenv/config";
 
+const express = require('express');
+const bodyParser = require('body-parser');
 
 const app = express();
+app.use(bodyParser.json());
 
+let contacts = [];
+let currentId = 1;
 
-// Middleware for parsing JSON request bodies
-app.use(express.json());
+// Create a Contact
+app.post('/contacts', (req, res) => {
+  const newContact = {
+    id: currentId++,
+    name: req.body.name,
+    email: req.body.email,
+    phone: req.body.phone
+  };
+  contacts.push(newContact);
+  res.status(201).json(newContact);
+});
 
+// Get All Contacts
+app.get('/contacts', (req, res) => {
+  res.json(contacts);
+});
+
+// Get a Single Contact
+app.get('/contacts/:id', (req, res) => {
+  const contact = contacts.find(c => c.id == req.params.id);
+  if (!contact) {
+    return res.status(404).json({ message: 'Contact not found' });
+  }
+  res.json(contact);
+});
+
+// Update a Contact
+app.put('/contacts/:id', (req, res) => {
+  const contact = contacts.find(c => c.id == req.params.id);
+  if (!contact) {
+    return res.status(404).json({ message: 'Contact not found' });
+  }
+  contact.name = req.body.name;
+  contact.email = req.body.email;
+  contact.phone = req.body.phone;
+  res.json(contact);
+});
+
+// Delete a Contact
+app.delete('/contacts/:id', (req, res) => {
+  contacts = contacts.filter(c => c.id != req.params.id);
+  res.json({ message: 'Contact deleted successfully' });
+});
 
 const PORT = process.env.PORT || 3000;
-
-
-// Connection URL
-const url = process.env.MONGO_URL;
-
-
-const client = new MongoClient(url);
-
-
-async function ConnectDB() {
-    try {
-      await client.connect();
-      console.log("✔✔ Connected to the database ✔✔");
-      return client;
-    } catch (error) {
-      if (error instanceof MongoServerError) {
-        console.log(`Error worth logging: ${error}`); // special case for some reason
-      }
-      throw error; // still want to crash
-    }
-  }
-  
-  
-  await ConnectDB();
-  
-
-
-// home get method
-const contacts = [
-  { id: '1', name: 'John Doe', email: 'john.doe@example.com', phone: '123-456-7890' },
-];
-
-app.get('/contacts', (req, res) => {
-  res.send(contacts);
-});
-
-
-
-
-
-//call back function to our app for feedback
 app.listen(PORT, () => {
-  console.log("Server running on port 3000 🎉🎉🎉");
+  console.log(`Server is running on port ${PORT}`);
 });
+
+
