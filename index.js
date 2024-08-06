@@ -5,6 +5,26 @@ import bodyParser from "body-parser";
 
 
 
+const url = process.env.MONGO_URL;
+const client = new MongoClient(url);
+
+async function ConnectDB() {
+  try {
+    await client.connect();
+    console.log("✔✔ Connected to the database ✔✔");
+    return client;
+  } catch (error) {
+    if (error instanceof MongoServerError) {
+      console.log(`Error worth logging: ${error}`); // special case for some reason
+    }
+    throw error; // still want to crash
+  }
+}
+await ConnectDB();
+
+
+
+
 
 const app = express();
 app.use(bodyParser.json());
