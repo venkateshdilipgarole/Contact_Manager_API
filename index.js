@@ -51,7 +51,7 @@ app.get('/contacts', (req, res) => {
 
 // Get a Single Contact
 app.get('/contacts/:id', (req, res) => {
-  const contact = contacts.find(c => c.id == req.params.id);
+  const contact = contacts.find(c => c.id == req.params.id);  
   if (!contact) {
     return res.status(404).json({ message: 'Contact not found' });
   }
